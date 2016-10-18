@@ -1,0 +1,79 @@
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+body {
+	font-family: 'Roboto', sans-serif;
+	background: url(./../assets/subtle_white_mini_waves.png);
+	margin: 16px;
+}
+.card {
+	background-color: whitesmoke;
+	color: black;
+	width: 100%;
+	margin: auto;
+	padding: 24px;
+	margin: auto;
+	width: 100%;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	transition: width 2s;
+}
+.name {
+	font-size: 1.8em;
+	font-weight: 300;
+	text-transform: uppercase;
+	letter-spacing: 0.5em;
+	margin: 0;
+}
+.interest-point {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+.pad-bot {
+	padding-bottom: 16px;
+}
+.contact {
+	font-size: 1em;
+}
+.contact .fa {
+	width: 32px;
+}
+.link {
+	text-decoration: none;
+	color: steelblue;
+	transition: color .2s;
+}
+.link:hover {
+	color: red;
+	transition: color .2s;
+}
+.motto {
+	font-size: 1em;
+	color: grey;
+	margin: 0;
+	text-align: center;
+}
+.motto .fa-heart {
+	color: hotpink;
+}
+.motto .fa-music {
+	color: lightseagreen;
+}
+@media only screen and (min-width: 500px) {
+    .card {
+    	max-width: 750px;
+		margin: 40px auto;
+		padding: 40px;
+		border-radius: 4px;
+    }
+    .name {
+    	font-size: 3em;
+    	line-height: 1.5em;
+    }
+}
+@media only screen and (min-width: 1000px) {
+    .card {
+    	max-width: 1000px;
+    }
+}
