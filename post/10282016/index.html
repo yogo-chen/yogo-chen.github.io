@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Tutorial: Simple Bouncing Ball animation on HTML Canvas</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="./../../css/style.css">
+</head>
+<body>
+<div class="card">
+	<p class="name">Prayogo Cendra</p>
+	<hr>
+	<h1>Tutorial: Simple Bouncing Ball animation on HTML Canvas - <a href="./demo/index.html" target="_blank" class="link">Demo</a></h1>
+	<h3>Let's Create a simple bouncing ball animation</h3>
+	<ol>
+		<li>Prepare our canvas
+			<p>
+				<pre>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+	&lt;title&gt;Bouncing Ball&lt;/title&gt;
+&lt;/head&gt;
+&lt;body onload="init()"&gt;
+	&lt;canvas id="my-canvas"&gt;&lt;/canvas&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+			</p>
+		</li>
+		<li>Set some CSS
+			<p>
+				<pre>
+body {
+	margin: 0;
+	background-color: black;
+}
+#my-canvas {
+	width: 100%;
+	height: 100%;
+}</pre>
+				We want our ball bouncing all over the page so set canvas width and height to 100%
+			</p>
+		</li>
+		<li>JavaScript, where all the fun begin
+			<ol type="a">
+				<li>Prepare all needed variables
+					<p>
+						<pre>
+//canvas properties
+var canvas = document.getElementById("my-canvas");
+var context = canvas.getContext("2d");
+
+//animation things
+var fps = 60;
+var updateTime = 1000 / fps;
+
+//easy variables for easy coding life
+var _PI = Math.PI;
+var _sin = Math.sin;
+var _cos = Math.cos;
+var _random = Math.random;
+var oneDegreeOnRadian = _PI / 180;
+
+// ball
+var ball;</pre>
+					</p>
+				</li>
+				<li>Next, we create our bouncing ball <i>class</i>
+					<p>
+						<pre>
+function Ball(radius, speed) {
+	this.radius = (radius) ? (radius) : (20); // ball size, default = 20
+	this.speed = (speed) ? (speed) : (10); // ball speed, default = 10
+	this.x = (_random() * (canvas.width - (2 * this.radius))) + this.radius; // random horizontal position
+	this.y = (_random() * (canvas.height - (2 * this.radius))) + this.radius; // random vertical position
+
+	var angleRadian = _random() * 360 * oneDegreeOnRadian; // random move angle direction
+
+	this.xSpeed = _cos(angleRadian) * this.speed; // speed on x axis
+	this.ySpeed = _sin(angleRadian) * this.speed; // speed on y axis
+
+	this.xDirection = (_random < 0.5) ? (1) : (-1); // x direction
+	this.yDirection = (_random < 0.5) ? (1) : (-1); // y direction
+
+	this.move = function() {
+		var nextX = this.x + (this.xDirection * this.xSpeed); // predict next x position
+		var nextY = this.y + (this.yDirection * this.ySpeed); // predict next y position
+
+		if(((nextX - this.radius) < 0) || ((nextX + this.radius) > canvas.width - 1)) { // if collide with left/right screen
+			this.xDirection *= -1; // change x direction
+		}
+		if(((nextY - this.radius) < 0) || ((nextY + this.radius) > canvas.height - 1)) { // if collide with top/bottom screen
+			this.yDirection *= -1; // change y direction
+		}
+
+		this.x += this.xDirection * this.xSpeed; // update x
+		this.y += this.yDirection * this.ySpeed; // update y
+	}
+
+	this.draw = function() {
+		context.fillStyle = "tomato"; // ball color
+		context.beginPath();
+		context.arc(this.x, this.y, this.radius, 0, _PI * 2, false); // draw circle
+		context.closePath();
+		context.fill(); // draw ball on canvas
+	}
+}</pre>
+					</p>
+					<p>
+						Our bouncing class has properties such as:
+						<ul>
+							<li>
+								<b>radius</b> - how big is the ball
+							</li>
+							<li>
+								<b>speed</b> - how fast will it move
+							</li>
+							<li>
+								<b>x, y</b> - coordinate of the ball on canvas
+							</li>
+							<li>
+								<b>xSpeed</b> - speed of ball on x axis (translated from speed and random angle)
+							</li>
+							<li>
+								<b>ySpeed</b> - speed of ball on y axis (translated from speed and random angle)
+							</li>
+							<li>
+								<b>xDirection </b> - specify the direction of the ball on x axis (-1 for left and 1 for right)
+							</li>
+							<li>
+								<b>xDirection </b> - specify the direction of the ball on y axis (-1 for up and 1 for down)
+							</li>
+							<li>
+								<b>move()</b> - function that we call to move the ball
+							</li>
+							<li>
+								<b>draw()</b> - function to draw this ball on canvas
+							</li>
+						</ul>
+					</p>
+				</li>
+				<li>
+					<p>Next, we create functions to animate our bouncing ball
+						<pre>
+function clear() {
+	context.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
+}
+
+function update() {
+	ball.move(); // move ball
+}
+
+function draw() {
+	ball.draw(); // draw the ball
+}
+
+function animate() {
+	clear();
+	update();
+	draw();
+}</pre>
+					</p>
+				</li>
+				<li>Add function to resize the canvas
+					<p>
+						<pre>
+// update canvas size when resizing window 
+function resizeCanvas() {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+}</pre>
+					</p>
+				</li>
+				<li>Initialize and run our animation
+					<p>
+						<pre>
+//initialize canvas
+function init() {
+	window.addEventListener('resize', resizeCanvas, false);
+	resizeCanvas();
+	ball = new Ball(50, 10);
+	setInterval(function() {
+		animate();
+	}, updateTime);
+}</pre>
+					</p>
+					<p>
+						<b>window.addEventListener('resize', resizeCanvas, false);</b> - this add an event listener that will call resizeCanvas() when you resize the browser
+					</p>
+				</li>
+			</ol>
+		</li>
+		<li><b>Finally</b>, save your file and run on your favorite browser
+			<p>
+				This is the final code
+				<pre>
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+	&lt;title&gt;Bouncing Ball&lt;/title&gt;
+	&lt;style type="text/css"&gt;
+		body {
+			margin: 0;
+			background-color: black;
+		}
+		#my-canvas {
+			width: 100%;
+			height: 100%;
+		}
+	&lt;/style&gt;
+&lt;/head&gt;
+&lt;body onload="init()"&gt;
+	&lt;canvas id="my-canvas"&gt;&lt;/canvas&gt;
+&lt;script type="text/javascript"&gt;
+	//canvas properties
+	var canvas = document.getElementById("my-canvas");
+	var context = canvas.getContext("2d");
+
+	//animation things
+	var fps = 60;
+	var updateTime = 1000 / fps;
+
+	//easy variables for easy coding life
+	var _PI = Math.PI;
+	var _sin = Math.sin;
+	var _cos = Math.cos;
+	var _random = Math.random;
+	var oneDegreeOnRadian = _PI / 180;
+
+	// ball
+	var ball;
+
+	//Our bouncing ball class
+	function Ball(radius, speed) {
+		this.radius = (radius) ? (radius) : (20); // ball size
+		this.speed = (speed) ? (speed) : (10); // ball speed
+		this.x = (_random() * (canvas.width - (2 * this.radius))) + this.radius; // random horizontal position
+		this.y = (_random() * (canvas.height - (2 * this.radius))) + this.radius; // random vertical position
+
+		var angleRadian = _random() * 360 * oneDegreeOnRadian; // random move direction
+
+		this.xSpeed = _cos(angleRadian) * this.speed; // translate speed on x axis
+		this.ySpeed = _sin(angleRadian) * this.speed; // translate speed on y axis
+
+		this.xDirection = (_random < 0.5) ? (1) : (-1); // random first x direction
+		this.yDirection = (_random < 0.5) ? (1) : (-1); // random first x direction
+
+		this.move = function() {
+			var nextX = this.x + (this.xDirection * this.xSpeed); // predict next x position
+			var nextY = this.y + (this.yDirection * this.ySpeed); // predict next y position
+
+			if(((nextX - this.radius) < 0) || ((nextX + this.radius) > canvas.width - 1)) { // if collide with left/right screen
+				this.xDirection *= -1; // change x direction
+			}
+			if(((nextY - this.radius) < 0) || ((nextY + this.radius) > canvas.height - 1)) { // if collide with top/bottom screen
+				this.yDirection *= -1; // change y direction
+			}
+
+			this.x += this.xDirection * this.xSpeed; // update x
+			this.y += this.yDirection * this.ySpeed; // update y
+		}
+
+		this.draw = function() {
+			context.fillStyle = "tomato"; // ball color
+			context.beginPath();
+			context.arc(this.x, this.y, this.radius, 0, _PI * 2, false); // draw circle
+			context.closePath();
+			context.fill(); // draw ball on canvas
+		}
+	}
+
+	function clear() {
+		context.clearRect(0, 0, canvas.width, canvas.height); // clear canvas
+	}
+
+	function update() {
+		ball.move(); // move ball
+	}
+
+	function draw() {
+		ball.draw();
+	}
+
+	function animate() {
+		clear();
+		update();
+		draw();
+	}
+
+	// update canvas size when resizing window 
+	function resizeCanvas() {
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+	}
+
+	//initialize canvas
+	function init() {
+		window.addEventListener('resize', resizeCanvas, false);
+		resizeCanvas();
+		ball = new Ball(50, 10);
+		//run animation
+		setInterval(function() {
+			animate();
+		}, updateTime);
+	}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+				</pre>
+			</p>
+		</li>
+	</ol>
+</div>
+</body>
+</html>
